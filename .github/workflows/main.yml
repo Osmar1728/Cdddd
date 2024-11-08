@@ -1,0 +1,45 @@
+name: Test Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  regression_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt || echo "No hay dependencias"
+
+      - name: Run regression tests
+        run: python -m unittest discover
+
+  performance_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install pytest pytest-benchmark || echo "No hay dependencias"
+
+      - name: Run performance tests
+        run: |
+          pytest --benchmark-only --benchmark-min-rounds=10
